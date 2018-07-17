@@ -329,7 +329,7 @@ class API(EndpointsMixin, object):
         """ Instantiates an instance of BitfinexPy's API wrapper """
 
         if environment == 'live':
-            self.api_url = 'https://api.bitfinex.com/v1/'
+            self.api_url = 'https://api.bitfinex.com/v2/'
         else:
             # for future, access to a demo account.
             pass
@@ -347,7 +347,7 @@ class API(EndpointsMixin, object):
 
         if auth:
             payload_object = {
-                "request": "/v1/%s" % endpoint,
+                "request": "/v2/%s" % endpoint,
                 "nonce": str(time.time() * 1000000)  # update nonce each POST request
             }
             if payload_params is not None:
