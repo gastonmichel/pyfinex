@@ -18,6 +18,14 @@ import time
 # EndpointsMixin provides a mixin for the API instance
 class EndpointsMixin(object):
     # Public API #######################################################
+    def platform_status(self, **params):
+        """ Get the current status of the platform. Maintenance periods last for just few minutes and might be necessary 
+        from time to time during upgrades of core components of our infrastructure.
+        Docs: https://bitfinex.readme.io/v2/reference#rest-public-platform-status
+        """
+        endpoint = 'platform/status'
+        return self.request(endpoint, auth=False, params=params)
+
     def ticker(self, **params):
         """ Gives innermost bid and asks and information on the most recent trade, as well as high, low and volume of the last 24 hours.
         Docs: https://docs.bitfinex.com/v1/reference#rest-public-ticker
