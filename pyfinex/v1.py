@@ -1,436 +1,339 @@
-# -*- coding: utf-8 -*-
-# BITFINEX API wrapper
-#
-#
-# AUTHOR: @jimako1989
-# GITHUB: github.com/jimako1989/bitfinexpy
-# LICENSE: MIT
-#
-
-import base64
-import hashlib
-import hmac
+# Import Built-Ins
 import json
-import requests
-import time
 
+# Import Homebrew
+from pyfinex.api import API
 
 # EndpointsMixin provides a mixin for the API instance
-class EndpointsMixin(object):
-    # Public API #######################################################
+class V1(API):
+    def __init__(self, **kargs):
+        super().__init__(**kargs)
+        self.version = 1
+    # REST PUBLIC ENDPOINTS ###################################################
     def ticker(self, **params):
         """ Gives innermost bid and asks and information on the most recent trade, as well as high, low and volume of the last 24 hours.
         Docs: https://docs.bitfinex.com/v1/reference#rest-public-ticker
         """
         symbol = params.pop('symbol')
         endpoint = 'pubticker/' + symbol
-        return self.request(endpoint, auth=False, params=params)
+        return self.request(endpoint, method='GET', auth=False, params=params)
 
     def stats(self, **params):
         """ Various statistics about the requested pair.
-        Docs: http://docs.bitfinex.com/#stats
+        Docs: https://bitfinex.readme.io/v1/reference#rest-public-stats
         """
         symbol = params.pop('symbol')
         endpoint = 'stats/' + symbol
-        return self.request(endpoint, auth=False, params=params)
+        return self.request(endpoint, method='GET', auth=False, params=params)
 
     def fundingbook(self, **params):
         """ Get the full margin funding book.
-        Docs: http://docs.bitfinex.com/#fundingbook
+        Docs: https://bitfinex.readme.io/v1/reference#rest-public-fundingbook
         """
         symbol = params.pop('symbol')
         endpoint = 'lendbook/' + symbol
-        return self.request(endpoint, auth=False, params=params)
+        return self.request(endpoint, method='GET', auth=False, params=params)
 
     def orderbook(self, **params):
         """ Get the full order book.
-        Docs: http://docs.bitfinex.com/#orderbook
+        Docs: https://bitfinex.readme.io/v1/reference#rest-public-orderbook
         """
         symbol = params.pop('symbol')
         endpoint = 'book/' + symbol
-        return self.request(endpoint, auth=False, params=params)
+        return self.request(endpoint, method='GET', auth=False, params=params)
 
     def trades(self, **params):
         """ Get a list of the most recent trades for the given symbol.
-        Docs: http://docs.bitfinex.com/#trades
+        Docs: https://bitfinex.readme.io/v1/reference#rest-public-trades
         """
         symbol = params.pop('symbol')
         endpoint = 'trades/' + symbol
-        return self.request(endpoint, auth=False, params=params)
+        return self.request(endpoint, method='GET', auth=False, params=params)
 
     def lends(self, **params):
         """ Get a list of the most recent funding data for the given currency: total amount lent and Flash Return Rate (in % by 365 days) over time.
-        Docs: http://docs.bitfinex.com/#lends
+        Docs: https://bitfinex.readme.io/v1/reference#rest-public-lends
         """
         symbol = params.pop('symbol')
         endpoint = 'lends/' + symbol
-        return self.request(endpoint, auth=False, params=params)
+        return self.request(endpoint, method='GET', auth=False, params=params)
 
     def symbols(self, **params):
         """ Get a list of valid symbol IDs.
-        Docs: http://docs.bitfinex.com/#symbols
+        Docs: https://bitfinex.readme.io/v1/reference#rest-public-symbols
         """
         endpoint = 'symbols'
-        return self.request(endpoint, auth=False, params=params)
+        return self.request(endpoint, method='GET', auth=False, params=params)
 
     def symbol_details(self, **params):
         """ Get a list of valid symbol IDs and the pair details.
-        Docs: http://docs.bitfinex.com/#symbol-details
+        Docs: https://bitfinex.readme.io/v1/reference#rest-public-symbol-details
         """
         symbol = params.pop('symbol')
-        endpoint = 'book/' + symbol
-        return self.request(endpoint, auth=False, params=params)
+        endpoint = 'symbols_details'
+        return self.request(endpoint, method='GET', auth=False, params=params)
 
-    # Private API #######################################################
+    # REST AUTHENTICATED ENDPOINTS ############################################
     # Account
-    def account_infos(self, **params):
+    def account_fees(self, **params):
         """ Check the balance.
-        Docs: http://docs.bitfinex.com/#account-info
+        Docs: https://bitfinex.readme.io/v1/reference#rest-auth-account-info
         """
         endpoint = 'account_infos'
-        return self.request(endpoint, payload_params=params)
+        return self.request(endpoint, method='POST', payload_params=params)
 
-    # Deposit
+    def account_infos(self, **params):
+        """  See the fees applied to your withdrawals.
+        Docs: https://bitfinex.readme.io/v1/reference#rest-auth-fees
+        """
+        endpoint = 'account_fees'
+        return self.request(endpoint, method='POST', payload_params=params)
+
+    def summary(self, **params):
+        """  Returns a 30-day summary of your trading volume and return on margin funding.
+        Docs: https://bitfinex.readme.io/v1/reference#rest-auth-summary
+        """
+        endpoint = 'summary'
+        return self.request(endpoint, method='POST', payload_params=params)
+
     def deposit(self, **params):
         """ Return your deposit address to make a new deposit.
-        Docs: http://docs.bitfinex.com/#deposit
+        Docs: https://bitfinex.readme.io/v1/reference#rest-auth-deposit
         """
         endpoint = 'deposit/new'
-        return self.request(endpoint, payload_params=params)
+        return self.request(endpoint, method='POST', payload_params=params)
+
+    def key_permissions(self, **params):
+        """ Check the permissions of the key being used to generate this request.
+        Docs: https://bitfinex.readme.io/v1/reference#auth-key-permissions
+        """
+        endpoint = 'key_info'
+        return self.request(endpoint, method='POST', payload_params=params)
+    
+    def margin_information(self, **params):
+        """ See your trading wallet information for margin trading.
+        Docs: https://bitfinex.readme.io/v1/reference#rest-auth-margin-information
+        """
+        endpoint = 'margin_infos'
+        return self.request(endpoint, method='POST', payload_params=params)
+    
+    def wallet_balances(self, **params):
+        """ See your balances.
+        Docs: https://bitfinex.readme.io/v1/reference#rest-auth-wallet-balances
+        """
+        endpoint = 'balances'
+        return self.request(endpoint, method='POST', payload_params=params)
+
+    def tansfer_between_wallets(self, **params):
+        """ Allow you to move available balances between your wallets.
+        Docs: https://bitfinex.readme.io/v1/reference#rest-auth-transfer-between-wallets
+        """
+        endpoint = 'transfer'
+        return self.request(endpoint, method='POST', payload_params=params)
+
+    def withdrawal(self, **params):
+        """ Allow you to request a withdrawal from one of your wallet.
+        Docs: https://bitfinex.readme.io/v1/reference#rest-auth-withdrawal
+        """
+        endpoint = 'withdraw'
+        return self.request(endpoint, method='POST', payload_params=params)
 
     # Order
-    def new_order(self, symbol, amount, price, side, order_type, **params):
+    def new_order(self, **params):
         """ Submit a new order.
-        Docs: http://docs.bitfinex.com/#new-order
+        Docs: https://bitfinex.readme.io/v1/reference#rest-auth-orders
         """
         endpoint = 'order/new'
-        params['symbol'] = symbol
-        params['amount'] = amount
-        params['price'] = price
-        params['side'] = side
-        params['type'] = order_type
-        params['exchange'] = 'bitfinex'
         return self.request(endpoint, method='POST', payload_params=params)
 
-    def multiple_new_orders(self, orders, **params):
+    def multiple_new_orders(self, **params): #TODECIDE: enforce params or not
         """ Submit several new orders at once.
-        Docs: http://docs.bitfinex.com/#new-order
+        Docs: https://bitfinex.readme.io/v1/reference#rest-auth-multiple-new-orders
         """
         endpoint = 'order/new/multi'
-        params['orders'] = json.dumps(orders)
         return self.request(endpoint, method='POST', payload_params=params)
 
-    def cancel_order(self, order_id, **params):
+    def cancel_order(self, **params):
         """ Cancel an order.
-        Docs: http://docs.bitfinex.com/#cancel-order
+        Docs: https://bitfinex.readme.io/v1/reference#rest-auth-cancel-order
         """
         endpoint = 'order/cancel'
-        params['oder_id'] = order_id
         return self.request(endpoint, method='POST', payload_params=params)
 
-    def cancel_multiple_orders(self, order_ids, **params):
+    def cancel_multiple_orders(self, **params):
         """ Cancel multiples orders at once.
-        Docs: http://docs.bitfinex.com/#cancel-multiple-orders
+        Docs: https://bitfinex.readme.io/v1/reference#rest-auth-cancel-multiple-orders
         """
         endpoint = 'order/cancel/multi'
-        params['order_ids'] = order_ids
         return self.request(endpoint, method='POST', payload_params=params)
 
     def cancel_all_orders(self, **params):
         """ Cancel multiples orders at once.
-        Docs: http://docs.bitfinex.com/#cancel-all-orders
+        Docs: https://bitfinex.readme.io/v1/reference#rest-auth-cancel-all-orders
         """
         endpoint = 'order/cancel/all'
         return self.request(endpoint, method='POST', payload_params=params)
 
-    def replace_order(self, order_id, symbol, amount, price, side, order_type, **params):
+    def replace_order(self, **params):
         """ Replace an orders with a new one.
-        Docs: http://docs.bitfinex.com/#replace-orders
+        Docs: https://bitfinex.readme.io/v1/reference#rest-auth-replace-order
         """
         endpoint = 'order/cancel/replace'
-        params['order_id'] = order_id
-        params['symbol'] = symbol
-        params['amount'] = amount
-        params['price'] = price
-        params['side'] = side
-        params['type'] = order_type
-        params['exchange'] = 'bitfinex'
         return self.request(endpoint, method='POST', payload_params=params)
 
-    def order_status(self, order_id, **params):
+    def order_status(self, **params):
         """ Get the status of an order. Is it active? Was it cancelled? To what extent has it been executed? etc.
-        Docs: http://docs.bitfinex.com/#order-status
+        Docs: https://bitfinex.readme.io/v1/reference#rest-auth-order-status
         """
         endpoint = 'order/status'
-        params['order_id'] = order_id
         return self.request(endpoint, method='POST', payload_params=params)
 
     def active_orders(self, **params):
         """ View your active orders.
-        Docs: http://docs.bitfinex.com/#active-orders
+        Docs: https://bitfinex.readme.io/v1/reference#rest-auth-active-orders
         """
         endpoint = 'orders'
+        return self.request(endpoint, method='POST', payload_params=params)
+    
+    def orders_history(self, **params):
+        """ View your active orders.
+        Docs: https://bitfinex.readme.io/v1/reference#rest-auth-orders-history
+        """
+        endpoint = 'orders/hist'
         return self.request(endpoint, method='POST', payload_params=params)
 
     # Positions
     def active_positions(self, **params):
         """ View your active positions.
-        Docs: http://docs.bitfinex.com/#active-positions
+        Docs: https://bitfinex.readme.io/v1/reference#rest-auth-active-positions
         """
         endpoint = 'positions'
         return self.request(endpoint, method='POST', payload_params=params)
 
-    def claim_position(self, position_id, **params):
+    def claim_position(self, **params):
         """ A position can be claimed if:
         It is a long position:
             The amount in the last unit of the position pair that you have in your trading wallet AND/OR the realized profit of the position is greater or equal to the purchase amount of the position (base price * position amount) and the funds which need to be returned.
             For example, for a long BTCUSD position, you can claim the position if the amount of USD you have in the trading wallet is greater than the base price * the position amount and the funds used.
         It is a short position:
             The amount in the first unit of the position pair that you have in your trading wallet is greater or equal to the amount of the position and the margin funding used.
-        Docs: http://docs.bitfinex.com/#claim-position
+        Docs: https://bitfinex.readme.io/v1/reference#rest-auth-claim-position
         """
         endpoint = 'position/claim'
-        params['position_id'] = position_id
         return self.request(endpoint, method='POST', payload_params=params)
 
     # Historical Data
-    def balance_history(self, currency, **params):
+    def balance_history(self, **params):
         """ View all of your balance ledger entries.
-        Docs: http://docs.bitfinex.com/#balance-history
+        Docs: https://bitfinex.readme.io/v1/reference#rest-auth-balance-history
         """
         endpoint = 'history'
-        params['currency'] = currency
         return self.request(endpoint, method='POST', payload_params=params)
 
-    def deposit_withdrawal_history(self, currency, **params):
+    def deposit_withdrawal_history(self, **params):
         """ View all of your balance ledger entries.
-        Docs: http://docs.bitfinex.com/#balance-history
+        Docs: https://bitfinex.readme.io/v1/reference#rest-auth-deposit-withdrawal-history
         """
         endpoint = 'history/movements'
-        params['currency'] = currency
         return self.request(endpoint, method='POST', payload_params=params)
 
-    def past_trades(self, symbol, **params):
+    def past_trades(self, **params):
         """ View all of your balance ledger entries.
-        Docs: http://docs.bitfinex.com/#balance-history
+        Docs: https://bitfinex.readme.io/v1/reference#rest-auth-past-trades
         """
         endpoint = 'mytrades'
-        params['symbol'] = symbol
         return self.request(endpoint, method='POST', payload_params=params)
 
     # Margin Funding
-    def new_offer(self, currency, amount, rate, period, direction, **params):
+    def new_offer(self, **params):
         """ Submit a new offer.
-        Docs: http://docs.bitfinex.com/#new-offer
+        Docs: https://bitfinex.readme.io/v1/reference#rest-auth-new-offer
         """
         endpoint = 'offer/new'
-        params['currency'] = currency
-        params['amount'] = amount
-        params['rate'] = rate
-        params['period'] = period
-        params['direction'] = direction
         return self.request(endpoint, method='POST', payload_params=params)
 
-    def cancel_offer(self, offer_id, **params):
+    def cancel_offer(self, **params):
         """ Cancel an offer.
-        Docs: http://docs.bitfinex.com/#cancel-offer
+        Docs: https://bitfinex.readme.io/v1/reference#rest-auth-cancel-offer
         """
         endpoint = 'offer/cancel'
-        params['offer_id'] = offer_id
         return self.request(endpoint, method='POST', payload_params=params)
 
-    def offer_status(self, offer_id, **params):
+    def offer_status(self, **params):
         """ Get the status of an offer. Is it active? Was it cancelled? To what extent has it been executed? etc.
-        Docs: http://docs.bitfinex.com/#offer-status
+        Docs: https://bitfinex.readme.io/v1/reference#rest-auth-offer-status
         """
         endpoint = 'offer/status'
-        params['offer_id'] = offer_id
         return self.request(endpoint, method='POST', payload_params=params)
 
     def active_credits(self, **params):
+        """ View your funds currently taken (active credits).
+        Docs: https://bitfinex.readme.io/v1/reference#rest-auth-active-credits
+        """
+        endpoint = 'credits'
+        return self.request(endpoint, method='POST', payload_params=params)
+
+    def offers(self, **params):
         """ View your active offers.
-        Docs: http://docs.bitfinex.com/#active-credits
+        Docs: https://bitfinex.readme.io/v1/reference#rest-auth-offers
         """
         endpoint = 'offers'
         return self.request(endpoint, method='POST', payload_params=params)
 
+    def offers_hist(self, **params):
+        """ View your latest inactive offers. Limited to last 3 days and 1 request per minute.
+        Docs: https://bitfinex.readme.io/v1/reference#rest-auth-offers-hist
+        """
+        endpoint = 'offers/hist'
+        return self.request(endpoint, method='POST', payload_params=params)
+
+    def mytrades_funding(self, **params):
+        """ View your past trades.
+        Docs: https://bitfinex.readme.io/v1/reference#rest-auth-mytrades-funding
+        """
+        endpoint = 'mytrades_funding'
+        return self.request(endpoint, method='POST', payload_params=params)
+
     def active_funding_used_in_a_margin_position(self, **params):
         """ View your funding currently borrowed and used in a margin position.
-        Docs: http://docs.bitfinex.com/#active-funding-used-in-a-margin-position
+        Docs: https://bitfinex.readme.io/v1/reference#rest-auth-active-funding-used-in-a-margin-position
         """
         endpoint = 'taken_funds'
         return self.request(endpoint, method='POST', payload_params=params)
 
+    def active_funding_not_used_in_a_margin_position(self, **params):
+        """ View your funding currently borrowed and not used (available for a new margin position).
+        Docs: https://bitfinex.readme.io/v1/reference#rest-auth-active-funding-not-used-in-a-margin-position
+        """
+        endpoint = 'unused_taken_funds'
+        return self.request(endpoint, method='POST', payload_params=params)
+
     def total_taken_funds(self, **params):
         """ View the total of your active-funding used in your position(s).
-        Docs: http://docs.bitfinex.com/#total-taken-funds
+        Docs: https://bitfinex.readme.io/v1/reference#rest-auth-total-taken-funds
         """
         endpoint = 'total_taken_funds'
         return self.request(endpoint, method='POST', payload_params=params)
 
     def close_margin_funding(self, **params):
-        """ Return the funding taken in a margin position.
-        Docs: http://docs.bitfinex.com/#total-taken-funds
+        """ Allow you to close an unused or used taken fund
+        Docs: https://bitfinex.readme.io/v1/reference#rest-auth-close-margin-funding
         """
         endpoint = 'funding/close'
         return self.request(endpoint, method='POST', payload_params=params)
 
-    # Wallet Balances
-    def wallet_balances(self, **params):
-        """ See your balances.
-        Docs: http://docs.bitfinex.com/#wallet-balances
+    def basket_manage(self, **params):
+        """ This endpoint is used to manage the creation or destruction of tokens via splitting or merging. For the moment, this is only useful for the bcc and bcu tokens.
+        Docs: https://bitfinex.readme.io/v1/reference#basket-manage
         """
-        endpoint = 'balances'
+        endpoint = 'basket_manage'
         return self.request(endpoint, method='POST', payload_params=params)
 
-    # Margin Information
-    def margin_information(self, **params):
-        """ See your trading wallet information for margin trading.
-        Docs: http://docs.bitfinex.com/#margin-information
+    def close_position(self, **params):
+        """ Closes the selected position with a market order.
+        Docs: https://bitfinex.readme.io/v1/reference#close-position
         """
-        endpoint = 'margin_infos'
-        return self.request(endpoint, method='POST', payload_params=params)
-
-    # Transfer Between Wallets
-    def wallet_transfer(self, amount, currency, walletfrom, walletto, **params):
-        """ Allow you to move available balances between your wallets.
-        Docs: https://bitfinex.readme.io/v1/reference#rest-auth-transfer-between-wallets
-        """
-        endpoint = 'transfer'
-        params['amount'] = amount
-        params['currency'] = currency
-        params['walletfrom'] = walletfrom
-        params['walletto'] = walletto
-        return self.request(endpoint, method='POST', payload_params=params)
-
-    # Withdrawal
-    def withdrawal(self, withdraw_type, walletselected, amount, **params):
-        """ Allow you to request a withdrawal from one of your wallet.
-        Docs: http://docs.bitfinex.com/#withdrawal
-        """
-        endpoint = 'withdraw'
-        params['withdraw_type'] = withdraw_type
-        params['walletselected'] = walletselected
-        params['amount'] = amount
+        endpoint = 'position/close'
         return self.request(endpoint, method='POST', payload_params=params)
 
 
-# Provides functionality for access to core BITFINEX API calls
-class API(EndpointsMixin, object):
-    def __init__(self, environment='live', key=None, secret_key=None):
-        """ Instantiates an instance of BitfinexPy's API wrapper """
-
-        if environment == 'live':
-            self.api_url = 'https://api.bitfinex.com/v1/'
-        else:
-            # for future, access to a demo account.
-            pass
-
-        self.key = key
-        self.secret_key = bytes(secret_key, 'utf-8')
-
-        self.client = requests.Session()
-
-    def request(self, endpoint, method='GET', auth=True, params=None, payload_params=None):
-        """ Returns dict of response from Bitfinex's open API """
-        method = method.lower()
-        url = '%s%s' % (self.api_url, endpoint)
-        request_args = {'params': params}
-
-        if auth:
-            payload_object = {
-                "request": "/v1/%s" % endpoint,
-                "nonce": str(time.time() * 1000000)  # update nonce each POST request
-            }
-            if payload_params is not None:
-                payload_object.update(payload_params)
-            payload = base64.b64encode(bytes(json.dumps(payload_object), "utf-8"))
-            signature = hmac.new(self.secret_key, msg=payload, digestmod=hashlib.sha384).hexdigest()
-            request_args['headers'] = {
-                'X-BFX-APIKEY': self.key,
-                'X-BFX-PAYLOAD': payload,
-                'X-BFX-SIGNATURE': signature
-            }
-            # request_args['data'] = {}
-
-        func = getattr(self.client, method)
-        try:
-            response = func(url, **request_args)
-            content = response.json()
-        except Exception as e:
-            print("Failed to get the response because %s. \
-                   The request url is %s" % (str(e), url))
-
-        # error message
-        if response.status_code >= 400:
-            print("%s error_response : %s" % (str(response.status_code), content))
-            raise BitfinexError(response.status_code, content)
-
-        return content
-
-
-# HTTPS Streaming
-class Streamer:
-    """ Provides functionality for HTTPS Streaming """
-    # TODO: WS stream reader
-    def __init__(self, symbol, environment='live', heartbeat=1.0):
-        """ Instantiates an instance of BitfinexPy's streaming API wrapper. """
-
-        self.connected = False
-
-        if environment == 'live':
-            self.api_url = 'https://api.bitfinex.com/v1/pubticker/' + symbol
-        else:
-            # for future, access to a demo account.
-            pass
-
-        self.heartbeat = heartbeat
-
-        self.client = requests.Session()
-
-    def start(self, **params):
-        """ Starts the stream with the given parameters """
-        keys = ['last_price', 'bid', 'volume', 'ask', 'low', 'high']
-
-        self.connected = True
-        request_args = {}
-        content_ = {k: None for k in keys}
-
-        while self.connected:
-            response = self.client.get(self.api_url, **request_args)
-            content = response.content.decode('ascii')
-            content = json.loads(content)
-
-            if response.status_code != 200:
-                self.on_error(content)
-
-            # when the tick is updated
-            if any([content.get(k) != content_.get(k) for k in keys]):
-                self.on_success(content)
-                content_ = content
-
-            time.sleep(self.heartbeat)
-
-    def on_success(self, content):
-        """ Called when data is successfully retrieved from the stream """
-        print(content)
-        return True
-
-    def on_error(self, content):
-        """ Called when stream returns non-200 status code
-        Override this to handle your streaming data.
-        """
-        self.connected = False
-        print(content)
-        return
-
-
-# Contains BITFINEX exception
-class BitfinexError(Exception):
-    """ Generic error class, catches bitfinex response errors
-    """
-
-    def __init__(self, status_code, error_response):
-        msg = "BITFINEX API returned error code %s (%s)" % (status_code, error_response['error'])
-
-        super(BitfinexError, self).__init__(msg)
