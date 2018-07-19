@@ -6,6 +6,61 @@ import json
 import requests
 import time
 
+API_URL = 'https://api.bitfinex.com/'
+
+def public_request( version:int, endpoint:str, params=None):
+    url = f'{API_URL}v{version}/{endpoint}'
+    request_args = {'params': params}
+    response = requests.get(url, **request_args)
+    content = response.json()
+    return content
+
+def auth_post( version:int, endpoint:str, payload_params=None, key=None, secret_key=None):
+    api_path = f'v{version}/{endpoint}'
+    url = API_URL + api_path
+    nonce = _nonce()
+    request_path = _request_path(version, api_path)
+    payload_object = {
+        'request': request_path,
+        'nonce': nonce
+        }
+    payload_object.update(payload_params)
+    payload = base64.b64encode(bytes(json.dumps(payload_object), "utf-8"))
+    signature = hmac.new(secret_key, msg=payload, digestmod=hashlib.sha384).hexdigest()
+    request_args = {'header' = _headers(version, nonce, signature, payload)}
+    response = self.client.request(method, url, **request_args)
+    content = response.json()
+    return content
+
+def _nonce():
+    """Returns a nonce.
+    Used in authentication
+    """
+    return str(int(round(time.time() * 1000)))
+
+def _request_path( version, api_path):
+    if version == 1:
+        request_path = api_path
+    elif version == 2:
+        request_path = '/api/' + api_path
+    return request_path
+
+def _headers( version, nonce, signature, payload):
+    if version == 1:
+        header = {
+            'X-BFX-APIKEY': key,
+            'X-BFX-PAYLOAD': payload,
+            'X-BFX-SIGNATURE': signature,
+        }
+    elif version == 2:
+        header = {
+            'bfx-nonce': nonce,
+            'bfx-apikey': key,
+            'bfx-signature': signature,
+            'content-type': 'application/json',
+        }
+    return header  
+
 class API(object):
     def __init__(self, environment='live', key=None, secret_key=None):
         self._key = key

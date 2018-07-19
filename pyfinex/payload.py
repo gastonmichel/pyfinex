@@ -1,3 +1,4 @@
+from enum import Enum
 
 class payload(object):
     
@@ -14,11 +15,11 @@ class payload(object):
             }
         return payload
 
-class side(object):
+class side(Enum):
     buy = 'buy'
     sell = 'sell'
 
-class margin_order(object):
+class margin_order(Enum):
     market = 'market'
     limit = 'limit'
     stop = 'stop'
