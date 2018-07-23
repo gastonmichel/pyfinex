@@ -1,11 +1,13 @@
-def active_positions(self, **params):
-        """ View your active positions.
-        Docs: https://bitfinex.readme.io/v1/reference#rest-auth-active-positions
-        """
-        endpoint = 'positions'
-        return self.request(endpoint, method='POST', payload_params=params)
+from pyfinex.request import auth_post
 
-def claim_position(self, **params):
+def active(key, secret_key, **params):
+    """ View your active positions.
+    Docs: https://bitfinex.readme.io/v1/reference#rest-auth-active-positions
+    """
+    endpoint = 'positions'
+    return auth_post(key, secret_key, 1, endpoint, params=params)
+
+def claim(key, secret_key, **params):
     """ A position can be claimed if:
     It is a long position:
         The amount in the last unit of the position pair that you have in your trading wallet AND/OR the realized profit of the position is greater or equal to the purchase amount of the position (base price * position amount) and the funds which need to be returned.
@@ -15,11 +17,11 @@ def claim_position(self, **params):
     Docs: https://bitfinex.readme.io/v1/reference#rest-auth-claim-position
     """
     endpoint = 'position/claim'
-    return self.request(endpoint, method='POST', payload_params=params)
+    return auth_post(key, secret_key, 1, endpoint, params=params)
 
-def close_position(self, **params):
+def close(key, secret_key, **params):
     """ Closes the selected position with a market order.
     Docs: https://bitfinex.readme.io/v1/reference#close-position
     """
     endpoint = 'position/close'
-    return self.request(endpoint, method='POST', payload_params=params)
+    return auth_post(key, secret_key, 1, endpoint, params=params)
