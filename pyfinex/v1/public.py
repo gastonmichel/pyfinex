@@ -56,6 +56,7 @@ def symbols(**params):
     return public_get(1, endpoint,params=params)
 
 def symbols_details(**params):
+    
     """ Get a list of valid symbol IDs and the pair details.
     Docs: https://bitfinex.readme.io/v1/reference#rest-public-symbol-details
     """

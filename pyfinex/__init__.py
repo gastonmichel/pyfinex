@@ -1,2 +1,5 @@
 name = "pyfinex"
-from pyfinex.client import Client
+from pyfinex import *
+
+# import v1
+# import v2
