@@ -1,50 +1,44 @@
 from ..request import public_get
 
-def ticker(**params):
+def ticker(symbol='BTCUSD', **params):
     """ Gives innermost bid and asks and information on the most recent trade, as well as high, low and volume of the last 24 hours.
     Docs: https://bitfinex.readme.io/v1/reference#rest-public-ticker
     """
-    symbol = params.pop('symbol')
     endpoint = f'pubticker/{symbol}'
     return public_get(1, endpoint,  params=params)
 
-def stats(**params):
+def stats(symbol='BTCUSD', **params):
     """ Various statistics about the requested pair.
     Docs: https://bitfinex.readme.io/v1/reference#rest-public-stats
     """
-    symbol = params.pop('symbol')
     endpoint = f'stats/{symbol}' 
     return public_get(1, endpoint,params=params)
 
-def funding_book(**params):
+def funding_book(currency='USD',**params):
     """ Get the full margin funding book.
     Docs: https://bitfinex.readme.io/v1/reference#rest-public-fundingbook
     """
-    currency = params.pop('currency')
     endpoint = f'lendbook/{currency}'
     return public_get(1, endpoint,params=params)
 
-def order_book(**params):
+def order_book(symbol='BTCUSD', **params):
     """ Get the full order book.
     Docs: https://bitfinex.readme.io/v1/reference#rest-public-orderbook
     """
-    symbol = params.pop('symbol')
     endpoint = f'book/{symbol}'
     return public_get(1, endpoint,params=params)
 
-def trades(**params):
+def trades(symbol='BTCUSD', **params):
     """ Get a list of the most recent trades for the given symbol.
     Docs: https://bitfinex.readme.io/v1/reference#rest-public-trades
     """
-    symbol = params.pop('symbol')
     endpoint = f'trades/{symbol}'
     return public_get(1, endpoint,params=params)
 
-def lends(**params):
+def lends(currency='USD', **params):
     """ Get a list of the most recent funding data for the given currency: total amount lent and Flash Return Rate (in % by 365 days) over time.
     Docs: https://bitfinex.readme.io/v1/reference#rest-public-lends
     """
-    currency = params.pop('currency')
     endpoint = f'lends/{currency}'
     return public_get(1, endpoint,params=params)
 
