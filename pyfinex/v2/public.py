@@ -1,4 +1,4 @@
-from pyfinex.request import public_get
+from .. import public_get
 
 def platform_status(**params):
     """ Get the current status of the platform. Maintenance periods last for just few minutes and might be necessary 

@@ -1,4 +1,4 @@
-from pyfinex.request import auth_post
+from ..request import auth_post
 
 def active(key, secret_key, **params):
     """ View your active positions.

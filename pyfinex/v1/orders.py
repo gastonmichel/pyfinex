@@ -1,4 +1,4 @@
-from pyfinex.request import auth_post
+from ..request import auth_post
 
 def new(key, secret_key, **params):
     """ Submit a new order.

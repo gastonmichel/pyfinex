@@ -1,10 +1,10 @@
-from pyfinex.request import auth_post
+from ..request import auth_post
 
 def balance(key, secret_key, **params):
-        """ View all of your balance ledger entries.
-        Docs: https://bitfinex.readme.io/v1/reference#rest-auth-balance-history
-        """
-        endpoint = 'history'
+    """ View all of your balance ledger entries.
+    Docs: https://bitfinex.readme.io/v1/reference#rest-auth-balance-history
+    """
+    endpoint = 'history'
     return auth_post(key, secret_key, 1, endpoint, params=params)
 
 def deposit_withdrawal(key, secret_key, **params):

@@ -1,4 +1,4 @@
-from pyfinex.request import public_get
+from ..request import public_get
 
 def ticker(**params):
     """ Gives innermost bid and asks and information on the most recent trade, as well as high, low and volume of the last 24 hours.
@@ -21,7 +21,7 @@ def funding_book(**params):
     Docs: https://bitfinex.readme.io/v1/reference#rest-public-fundingbook
     """
     currency = params.pop('currency')
-    endpoint = f'lendbook/{symbol}'
+    endpoint = f'lendbook/{currency}'
     return public_get(1, endpoint,params=params)
 
 def order_book(**params):
