@@ -6,9 +6,7 @@ import json
 import requests
 import time
 
-API_URL = 'https://api.bitfinex.com/'
-
-# TODO: evaluate Bitfinex 400BadRequest error handling
+API_URL = 'https://api.bitfinex.com'
 
 def public_get(version:int, endpoint:str, params=None):
     """Return the response from a GET request to the api
@@ -23,14 +21,17 @@ def public_get(version:int, endpoint:str, params=None):
     Returns:
         dict -- content
     """
-    api_path = f'v{version}/{endpoint}'
+    api_path = f'/v{version}/{endpoint}'
     response = requests.get(API_URL + api_path, params=params)
     content = response.json()
-    return content
+    if response.status_code >= 400:
+        raise BitfinexError(response.status_code, content)
+    else:
+        return content
 
 # TODO: evaluate public post for v2/calc
 def public_post():
-    pass
+    raise NotImplementedError
 
 def auth_post(key, secret_key, version:int, endpoint:str, params=None):
     """Return the response from a POST request to the api with authentification
@@ -47,13 +48,17 @@ def auth_post(key, secret_key, version:int, endpoint:str, params=None):
     Returns:
         dict -- content
     """
-    api_path = f'v{version}/{endpoint}'
+    api_path = f'/v{version}/{endpoint}'
     nonce = _nonce()
     payload = _payload(version, api_path, nonce, params)
-    header =  _headers(version, nonce, payload)
-    response = request.post( API_URL + api_path, header=header, data=params)
+    header =  _headers(key, secret_key, version, nonce, payload)
+    response = requests.post( API_URL + api_path, headers=header, data=params)
     content = response.json()
-    return content
+
+    if response.status_code >= 400:
+        raise BitfinexError(response.status_code, content)
+    else:
+        return content
 
 def _nonce():
     """Return a nonce.
@@ -84,14 +89,14 @@ def _payload(version, api_path, nonce, params):
         payload_object['request'] = api_path
         payload_object['nonce'] = nonce
         payload_object.update(params)
-        payload = base64.b64encode(bytes(json.dumps(payload_object), "utf-8"))
+        payload = base64.b64encode(bytes(json.dumps(payload_object), 'utf-8'))
     elif version == 2:
-        payload = '/api/' + api_path + nonce + json.dumps(params)
+        payload = '/api' + api_path + nonce + json.dumps(params)
     else:
         raise NotImplementedError
     return payload
 
-def _headers(key, version, nonce, payload):
+def _headers(key, secret_key, version, nonce, payload):
     """Return the request header based on version
 
     Arguments:
@@ -112,11 +117,11 @@ def _headers(key, version, nonce, payload):
     if version == 1:
         header['X-BFX-APIKEY'] = key
         header['X-BFX-PAYLOAD'] = payload
-        header['X-BFX-SIGNATURE'] = _sign(payload)
+        header['X-BFX-SIGNATURE'] = _sign(secret_key, payload)
     elif version == 2:
         header['bfx-nonce'] = nonce
         header['bfx-apikey'] = key
-        header['bfx-signature'] = _sign(payload) 
+        header['bfx-signature'] = _sign(secret_key, payload) 
     else:
         raise NotImplementedError
     return header  
@@ -131,4 +136,13 @@ def _sign(secret_key, payload):
     Returns:
         str -- signature
     """
-    return hmac.new(secret_key, msg=payload, digestmod=hashlib.sha384).hexdigest()
+    signature = hmac.new(bytes(secret_key,'utf-8'), msg=payload, digestmod=hashlib.sha384)
+    signature = signature.hexdigest()
+    return signature
+
+class BitfinexBadRequest(Exception):
+    """ Catches bitfinex response errors
+    """
+
+    def __init__(self, status_code, error_response):
+        msg = f'BITFINEX API returned error code {status_code}: {error_response['error']}'
