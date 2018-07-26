@@ -1,4 +1,4 @@
-from .. import public_get
+from ..request import public_get, public_post
 
 def platform_status(**params):
     """ Get the current status of the platform. Maintenance periods last for just few minutes and might be necessary 
@@ -49,3 +49,18 @@ def candles(**params):
     """
     endpoint = 'candles/trade:' + params.pop('TimeFrame') + ':' + params.pop('Symbol') + '/' + params.pop('Section')
     return public_get(2, endpoint,  params=params)
+
+def market_avg_price(**params):
+    """ Calculate the average execution rate for Trading or Margin funding.
+    Docs: https://bitfinex.readme.io/v2/reference#rest-calc-market-average-price
+    """
+    endpoint = 'calc/trade/avg'
+    return public_post(2, endpoint,  params=params)
+
+# TODO implement post params in body/ test if work in query url
+def forex_rate(**params):
+    """ Calculate the Foreign Exchange Rate
+    Docs: https://bitfinex.readme.io/v2/reference#foreign-exchange-rate
+    """
+    endpoint = 'calc/fx'
+    return public_post(2, endpoint,  params=params)
