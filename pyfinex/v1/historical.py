@@ -7,7 +7,7 @@ def balance(key, secret_key, **params):
     endpoint = 'history'
     return auth_post(key, secret_key, 1, endpoint, params=params)
 
-def deposit_withdrawal(key, secret_key, **params):
+def deposit_withdrawal_movements(key, secret_key, **params):
     """ View your past deposits/withdrawals.
     Docs: https://bitfinex.readme.io/v1/reference#rest-auth-deposit-withdrawal-history
     """
