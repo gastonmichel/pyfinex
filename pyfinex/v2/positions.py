@@ -1,8 +1,8 @@
-from ..request import auth_post
+from ..api import request
 
 def active(key, secret_key, **params):
     """ Get active positions
     Docs: https://bitfinex.readme.io/v2/reference#rest-auth-positions
     """
     endpoint = 'auth/r/positions'
-    return auth_post(key, secret_key, 2, endpoint, params=params)
+    return request(authenticate=True, key=key, secret_key=secret_key, version=2, endpoint=endpoint, method='POST', body_params=params)

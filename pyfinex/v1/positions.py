@@ -1,11 +1,11 @@
-from ..request import auth_post
+from ..api import request
 
 def active(key, secret_key, **params):
     """ View your active positions.
     Docs: https://bitfinex.readme.io/v1/reference#rest-auth-active-positions
     """
     endpoint = 'positions'
-    return auth_post(key, secret_key, 1, endpoint, params=params)
+    return request(authenticate=True, key=key, secret_key=secret_key, version=1, endpoint=endpoint, method='POST', body_params=params)
 
 def claim(key, secret_key, **params):
     """ A position can be claimed if:
@@ -17,11 +17,11 @@ def claim(key, secret_key, **params):
     Docs: https://bitfinex.readme.io/v1/reference#rest-auth-claim-position
     """
     endpoint = 'position/claim'
-    return auth_post(key, secret_key, 1, endpoint, params=params)
+    return request(authenticate=True, key=key, secret_key=secret_key, version=1, endpoint=endpoint, method='POST', body_params=params)
 
 def close(key, secret_key, **params):
     """ Closes the selected position with a market order.
     Docs: https://bitfinex.readme.io/v1/reference#close-position
     """
     endpoint = 'position/close'
-    return auth_post(key, secret_key, 1, endpoint, params=params)
+    return request(authenticate=True, key=key, secret_key=secret_key, version=1, endpoint=endpoint, method='POST', body_params=params)
