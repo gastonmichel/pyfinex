@@ -1,6 +1,7 @@
 import pyfinex
 import pytest
 from decouple import config
+
 API_KEY = config('API_KEY')
 API_SECRET = config('API_SECRET')
 
