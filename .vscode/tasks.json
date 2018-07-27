@@ -1,0 +1,24 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "1-dist-build",
+            "type": "shell",
+            "command": "python setup.py sdist bdist_wheel",
+            "problemMatcher": []
+        },
+        {
+            "label": "2-test pypi upload",
+            "type": "shell",
+            "command": "twine upload --repository-url https://test.pypi.org/legacy/ dist/*",
+            "problemMatcher": []
+        },
+        {
+            "label": "3-live pypi upload",
+            "type": "shell",
+            "command": "twine upload dist/*"
+        }
+    ]
+}
