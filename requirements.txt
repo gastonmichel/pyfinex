@@ -1,0 +1,4 @@
+requests
+# for tests:
+pytest
+python-decouple

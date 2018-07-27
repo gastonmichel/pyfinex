@@ -1,54 +1,87 @@
-bitfinexpy
+pyfinex
 ======
 Python wrapper for Bitfinex API.
 
 Dependencies
 ======
-Requests and Pandas libraries are required.
+Requests library is required.
 
 Usage
 ======
 
-Include the bitfinexpy module and create an bitfinexpy instance with your account credentials. For trading, a key and a secret key must be provided.
+Include the pyfinex module and use it as a toolbox. For trading, a key and a secret key must be provided.
 
-	import bitfinexpy
+	import pyfinex
 
-	bitfinex = bitfinexpy.API(environment="live", key="AaBbCc012...", secret_key="123a456...")
+    API_KEY = 'insert key'
+    API_SECRET = 'insert secret'
 
-**Method names are referred by the part of HTML label name after #, which you can see [Bitfinex API web page](http://docs.bitfinex.com/).**
+	resp = pyfinex.v1.positions.active(key=API_KEY, secret_key=API_SECRET)
+    resp = pyfinex.v1.public.ticker(symbol='btcusd')
 
-**In the label name, you don't forget to replace all '-'s with '_'.** (e.g. multiple-new-orders -> multiple_new_orders)
+Function names are organized for better coding
 
+**Function names are referred in part to the api doc's html, which you can see [Bitfinex API web page](http://docs.bitfinex.com/).**
+**Required params to build the request's url are coded in the function's args, other query params are to be added acording to api doc**
+
+**BEWARE: some inputs varies from v1 to v2. Example: v1>> 'BTCUSD' v2>> 'tBTCUSD'**
+
+All documented API calls are implemented!
 
 Examples
 ======
 
 ### Get the latest BTCUSD price
-	bitfinex.ticker(symbol='BTCUSD')
-
+	resp = pyfinex.v1.public.ticker(symbol='btcusd')
 ### View your active orders
-    bitfinex.active_orders()
-
-### See your balances
-    bitfinex.wallet_balances()
-
+    resp = pyfinex.v1.positions.active(API_KEY,API_SECRET)
+### Get the BTCUSD order book
+    resp = pyfinex.v1.public.order_book(symbol='btcusd')
+### Get the last BTCUSD 1m candle 
+    resp = pyfinex.v2.public.candles(Symbol='tBTCUSD', TimeFrame='1m', Section='last')
 ### Submit a new order
-For example, if you'd like to buy 0.001 BTC as 0.01 BTC/USD, you need to specify following parameters.
+For example, if you'd like to buy 0.001 BTC as 0.01 BTC/USD, you need to specify the parameters acording to the api doc. You may parse the response to get the order id for future use.
 
-	bitfinex.new_order(symbol="BTCUSD", amount=0.001, price=0.01, side="buy", type="market")
+	resp = pyfinex.v1.orders.new(symbol="BTCUSD", amount=0.001, price=0.01, side='buy', type='market')
 
+### In case there is a new call you can do it yourself!:
+    pyfinex.api.request(authenticate=True, 
+        key=API_KEY, 
+        secret_key=API_SECRET, 
+        version=1, 
+        endpoint='new/api/call/here', 
+        method='POST', 
+        body_params={}, 
+        query_params={})
 
-BTC Price Streaming
+Known Issues
 ======
-Create a custom streamer class to setup how you want to handle the data.
-Each tick is sent through the `on_success` and `on_error` functions.
-You can override these functions to handle the streaming data.
+- Authenticated post requests to v2 are still buggy, presumably server-side
 
-Initialize an instance of your custom streamer, and start connecting to the stream.
-
-    stream = bitfinexpy.Streamer(environment=DOMAIN, heartbeat=1.0)
-    stream.start()
+TODO
+=====
+- Debug v2 auth posts!
 
 
+## Contributing
 
-Copyright (c) 2015 jimako1989
+1. Create an issue and discuss.
+1. Fork it.
+1. Create a feature branch containing only your fix or feature.
+1. Add tests, please!!
+1. Create a pull request.
+1. Thanks!
+
+## References
+- [https://github.com/scottjbarr/bitfinex](https://github.com/scottjbarr/bitfinex)
+- [https://github.com/jimako1989/bitfinexpy](https://github.com/jimako1989/bitfinexpy)
+- [Bitfinex official API wrapper for Ruby](https://github.com/bitfinexcom/bitfinex-api-rb)
+- [Bitfinex v1 API doc](https://bitfinex.readme.io/v1/docs)
+- [Bitfinex v2 API doc](https://bitfinex.readme.io/v2/docs)
+## Licence
+
+The MIT License (MIT)
+
+Copyright (c) 2018 faberquisque
+
+See [LICENSE.md](LICENSE.md)

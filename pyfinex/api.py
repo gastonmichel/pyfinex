@@ -6,60 +6,144 @@ import json
 import requests
 import time
 
-class API(object):
-    def __init__(self, environment='live', key=None, secret_key=None):
-        self._key = key
-        self._secret_key = secret_key
-        self.client = requests.Session()
-        self.version = 0
-        if environment == 'live':
-            self.api_url = 'https://api.bitfinex.com/'
-        else:
-            # for future, access to a demo account.
-            pass
+API_URL = 'https://api.bitfinex.com'
 
-    def request(self, endpoint, method='GET', auth=True, params=None, payload_params=None):
-        """ Returns dict of response from Bitfinex's open API """
-        method = method.upper()
-        url = '%s/v%s/%s' % (self.api_url,self.version, endpoint)
-        request_args = {'params': params}
+def request(key=None, secret_key=None, version=1, endpoint=None, authenticate=False, method='GET', query_params=None, body_params=None):
+    """Return the response from a request to the Bitfinex API
+    
+    Arguments:
+        key {str} -- api key
+        secret_key {str} -- api secret key
+        version {int} -- api version
+        endpoint {str} -- api endpoint
+        authenticate {bool} -- auth or public request
+        method {str} -- request method ("GET" or "POST")
+        query_params {dict} -- query params to append to the URL 
+        body_params {dict} -- params to pass to the body of the request 
 
-        if auth:
-            payload_object = {
-                "request": "/v%s/%s" % (self.version,endpoint),
-                "nonce": str(time.time() * 1000000)  # update nonce each POST request
-            }
-            if payload_params is not None:
-                payload_object.update(payload_params)
-            payload = base64.b64encode(bytes(json.dumps(payload_object), "utf-8"))
-            signature = hmac.new(self._secret_key, msg=payload, digestmod=hashlib.sha384).hexdigest()
-            request_args['headers'] = {
-                'X-BFX-APIKEY': self._key,
-                'X-BFX-PAYLOAD': payload,
-                'X-BFX-SIGNATURE': signature
-            }
-            # request_args['data'] = {}
+    Keyword Arguments:
+        params {dict} -- parameters to pass to the body and the payload (default: {None})
+    
+    Raises:
+        ValueError
+        BitfinexBadRequest
 
-        try:
-            response = self.client.request(method, url, **request_args)
-            content = response.json()
-        except Exception as e:
-            print("Failed to get the response because %s. \
-                   The request url is %s" % (str(e), url))
+    Returns:
+        object -- content
+    """
+    if endpoint:
+        api_path = f'/v{version}/{endpoint}'
+    else:
+        raise(ValueError('No endpoint defined'))
+    if authenticate:
+        nonce = _nonce()
+        payload = _payload(version, api_path, nonce, body_params)
+        header =  _headers(key, secret_key, version, nonce, payload)
+    else:
+        header = {}
 
-        # error message
-        if response.status_code >= 400:
-            print("%s error_response : %s" % (str(response.status_code), content))
-            raise BitfinexError(response.status_code, content)
+    response = requests.request(method, API_URL + api_path, headers=header, data=body_params, params=query_params)
+    content = response.json()
 
+    if response.status_code >= 400:
+        raise BitfinexBadRequest(response.status_code, content)
+    else:
         return content
 
-# Contains BITFINEX exception
-class BitfinexError(Exception):
-    """ Generic error class, catches bitfinex response errors
+def _nonce():
+    """Return a nonce.
+    Used in authentication
+    
+    Returns:
+        str -- timestamp in milliseconds
     """
+    return str(int(round(time.time() * 1000)))
 
-    def __init__(self, status_code, error_response):
-        msg = "BITFINEX API returned error code %s (%s)" % (status_code, error_response['error'])
+def _payload(version, api_path, nonce, params):
+    """Return the header's payload based on version
 
-        super(BitfinexError, self).__init__(msg)
+    Arguments:
+        version {int} -- api version either 1 or 2
+        api_path {str} -- api path 
+        nonce {str} -- nonce
+        params {dict} -- parameters to include in the payload
+
+    Raises:
+        NotImplementedError -- version 1 and 2 supported
+
+    Returns:
+        [bytes] -- payload
+    """
+    if version == 1:
+        payload_object = {}
+        payload_object['request'] = api_path
+        payload_object['nonce'] = nonce
+        payload_object.update(params)
+        payload = json.dumps(payload_object) 
+    elif version == 2:
+        payload = '/api' + api_path + nonce + json.dumps(params)
+    else:
+        raise NotImplementedError
+    return base64.b64encode(bytes(payload, 'utf-8'))
+
+def _headers(key, secret_key, version, nonce, payload):
+    """Return the request header based on version
+
+    Arguments:
+        version {int} -- api version either 1 or 2
+        api_path {str} -- api path 
+        nonce {str} -- nonce
+        params {dict} -- parameters to include in the payload
+
+    Raises:
+        NotImplementedError -- version 1 and 2 supported
+
+    Returns:
+        [str] -- payload
+    """    
+    header = {}
+    header['content-type'] = 'application/json'
+    header['accept'] = 'application/json'
+    if version == 1:
+        header['X-BFX-APIKEY'] = key
+        header['X-BFX-PAYLOAD'] = payload
+        header['X-BFX-SIGNATURE'] = _sign(secret_key, payload)
+    elif version == 2:
+        header['bfx-nonce'] = nonce
+        header['bfx-apikey'] = key
+        header['bfx-signature'] = _sign(secret_key, payload) 
+    else:
+        raise NotImplementedError
+    return header  
+
+def _sign(secret_key, payload):
+    """Signs the payload with SHA384 algorithm
+    
+    Arguments:
+        secret_key {str} -- secret api key
+        payload {str} -- payload
+    
+    Returns:
+        str -- signature
+    """
+    signature = hmac.new(bytes(secret_key,'utf-8'), msg=payload, digestmod=hashlib.sha384)
+    signature = signature.hexdigest()
+    return signature
+
+class BitfinexBadRequest(Exception):
+    """ Catches bitfinex response errors
+
+    Atributes:
+        status_code {} -- status code of the request
+        message {} -- message from server
+    """
+    def __init__(self, status_code, message):
+        """Initialice an instance of BitfinexBadRequest
+        
+        Arguments:
+            status_code {} -- status code of the request
+            message {} -- message from server
+        """
+        self.status_code = status_code
+        self.message = message
+        super().__init__(f'BITFINEX API returned {status_code} Bad Request: {message}')
