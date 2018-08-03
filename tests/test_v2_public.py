@@ -4,8 +4,9 @@ import pyfinex
 
 def test_ticker():
     resp = pyfinex.v2.public.ticker()
+
 def test_failed_ticker():
-    with pytest.raises(pyfinex.request.BitfinexBadRequest):
+    with pytest.raises(pyfinex.api.BitfinexBadRequest):
         resp = pyfinex.v2.public.ticker(Symbol='btcusd')
 def test_stats():
     resp = pyfinex.v2.public.stats()
