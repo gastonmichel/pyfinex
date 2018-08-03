@@ -1,4 +1,3 @@
-# Import Built-Ins
 import base64
 import hashlib
 import hmac
@@ -42,7 +41,7 @@ def request(key=None, secret_key=None, version=1, endpoint=None, authenticate=Fa
     else:
         header = {}
 
-    response = requests.request(method, API_URL + api_path, headers=header, data=body_params, params=query_params)
+    response = requests.request(method, API_URL + api_path, headers=header, data=json.dumps(body_params), params=query_params, verify=True)
     content = response.json()
 
     if response.status_code >= 400:
@@ -72,7 +71,7 @@ def _payload(version, api_path, nonce, params):
         NotImplementedError -- version 1 and 2 supported
 
     Returns:
-        [bytes] -- payload
+        [str] -- payload
     """
     if version == 1:
         payload_object = {}
@@ -84,7 +83,7 @@ def _payload(version, api_path, nonce, params):
         payload = '/api' + api_path + nonce + json.dumps(params)
     else:
         raise NotImplementedError
-    return base64.b64encode(bytes(payload, 'utf-8'))
+    return payload
 
 def _headers(key, secret_key, version, nonce, payload):
     """Return the request header based on version
@@ -103,20 +102,22 @@ def _headers(key, secret_key, version, nonce, payload):
     """    
     header = {}
     header['content-type'] = 'application/json'
-    header['accept'] = 'application/json'
+    # header['accept'] = 'application/json'
     if version == 1:
+        message = base64.b64encode(payload.encode('utf8'))
         header['X-BFX-APIKEY'] = key
-        header['X-BFX-PAYLOAD'] = payload
-        header['X-BFX-SIGNATURE'] = _sign(secret_key, payload)
+        header['X-BFX-PAYLOAD'] = message
+        header['X-BFX-SIGNATURE'] = _sign(version, secret_key, message)
     elif version == 2:
+        message = payload.encode('utf8')
         header['bfx-nonce'] = nonce
         header['bfx-apikey'] = key
-        header['bfx-signature'] = _sign(secret_key, payload) 
+        header['bfx-signature'] = _sign(version, secret_key, message) 
     else:
         raise NotImplementedError
     return header  
 
-def _sign(secret_key, payload):
+def _sign(version, secret_key, message):
     """Signs the payload with SHA384 algorithm
     
     Arguments:
@@ -125,10 +126,9 @@ def _sign(secret_key, payload):
     
     Returns:
         str -- signature
-    """
-    signature = hmac.new(bytes(secret_key,'utf-8'), msg=payload, digestmod=hashlib.sha384)
-    signature = signature.hexdigest()
-    return signature
+    """   
+    signature = hmac.new(secret_key.encode('utf8'), msg=message, digestmod=hashlib.sha384)
+    return signature.hexdigest()
 
 class BitfinexBadRequest(Exception):
     """ Catches bitfinex response errors
