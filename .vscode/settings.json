@@ -6,5 +6,7 @@
         "--exitfirst",
         "--verbose",
         "tests"
-    ]
+    ],
+    "python.unitTest.promptToConfigure": true,
+    "python.unitTest.autoTestDiscoverOnSaveEnabled": true
 }
