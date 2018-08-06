@@ -30,7 +30,7 @@ All documented API calls are implemented!
 Examples
 ======
 ### Get the latest BTCUSD price
-	resp = pyfinex.v1.public.ticker(symbol='btcusd')
+    resp = pyfinex.v1.public.ticker(symbol='btcusd')
 ### View your active orders
     resp = pyfinex.v1.positions.active(API_KEY,API_SECRET)
 ### Get the BTCUSD order book
@@ -57,10 +57,11 @@ For example, if you'd like to buy 0.001 BTC as 0.01 BTC/USD, you need to specify
 Test
 ======
 1. Replace your keys in .env.example file, and rename it to .env
-1. Include your unit tests as functions in a test_vX_*.py file
+1. Include your unit tests as functions in a test_vX_ file:
+    
     def test_ticker():
-        resp = pyfinex.v1.public.ticker(symbol='btcusd')
-        resp['mid']
+       resp = pyfinex.v1.public.ticker(symbol='btcusd')
+
 1. Run the tests using pytest
 
 Known Issues
