@@ -8,7 +8,6 @@ Requests library is required.
 
 Usage
 ======
-
 Include the pyfinex module and use it as a toolbox. For trading, a key and a secret key must be provided.
 
 	import pyfinex
@@ -30,7 +29,6 @@ All documented API calls are implemented!
 
 Examples
 ======
-
 ### Get the latest BTCUSD price
 	resp = pyfinex.v1.public.ticker(symbol='btcusd')
 ### View your active orders
@@ -39,6 +37,8 @@ Examples
     resp = pyfinex.v1.public.order_book(symbol='btcusd')
 ### Get the last BTCUSD 1m candle 
     resp = pyfinex.v2.public.candles(Symbol='tBTCUSD', TimeFrame='1m', Section='last')
+
+Note: in v2 the parameters are capital case.
 ### Submit a new order
 For example, if you'd like to buy 0.001 BTC as 0.01 BTC/USD, you need to specify the parameters acording to the api doc. You may parse the response to get the order id for future use.
 
@@ -54,32 +54,42 @@ For example, if you'd like to buy 0.001 BTC as 0.01 BTC/USD, you need to specify
         body_params={}, 
         query_params={})
 
+Test
+======
+1. Replace your keys in .env.example file, and rename it to .env
+1. Include your unit tests as functions in a test_vX_*.py file
+    def test_ticker():
+        resp = pyfinex.v1.public.ticker(symbol='btcusd')
+        resp['mid']
+1. Run the tests using pytest
+
 Known Issues
 ======
-- Authenticated post requests to v2 are still buggy, presumably server-side
+- No
 
 TODO
 =====
-- Debug v2 auth posts!
+- Test every endpoint
 
 
-## Contributing
-
+Contributing
+======
 1. Create an issue and discuss.
-1. Fork it.
 1. Create a feature branch containing only your fix or feature.
 1. Add tests, please!!
 1. Create a pull request.
 1. Thanks!
 
-## References
+References
+======
 - [https://github.com/scottjbarr/bitfinex](https://github.com/scottjbarr/bitfinex)
 - [https://github.com/jimako1989/bitfinexpy](https://github.com/jimako1989/bitfinexpy)
 - [Bitfinex official API wrapper for Ruby](https://github.com/bitfinexcom/bitfinex-api-rb)
 - [Bitfinex v1 API doc](https://bitfinex.readme.io/v1/docs)
 - [Bitfinex v2 API doc](https://bitfinex.readme.io/v2/docs)
-## Licence
 
+Licence
+======
 The MIT License (MIT)
 
 Copyright (c) 2018 faberquisque
