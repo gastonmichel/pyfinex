@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="pyfinex",
-    version="1.0.1",
+    version="1.0.2",
     author="faberquisque",
     author_email="faberquisque@hotmail.com",
     description="Python wrapper for Bitfinex API v1 and v2",
