@@ -8,10 +8,3 @@ install:
   - pip install -e .
 
 script: pytest
-
-deploy:
-  provider: pypi
-  user: faberquisque
-  password: 
-    secure: qnBaZyTMGkLZejcQs2SLvS11n8s5ds8BQEL1O0zjeJ8KlhsKGJnPD2poDAgLsswYk49SfAedhq8MpRhqBHR8FST2qeD72aenzJGGbWPu1NZ1p9Mg4JuSQ/s4D3h7qPf4zfVe9iFyLylVM5AhkN/xrli4868vmb5Yj8sVDzJdkj/mnHNwZB3X6E9OPG3BqAx5c+5aCGpfr4eALhXm40r13aJJM5niUgpcsOifLebK7Ei/Q0B0nKV8h4cd+roVTOS6woX7DJjdr33Dd+Xxf3zdDv1uQamFJy8INuajKzegjpZB1EZZ/RvzUUe9NlUoF5qhnxktT2G6K5kKZD35Nba3bI3joXjyzMznmVtPhc0yDcQKEL1Nww5OC6C4SM5ABToAa0B73Z0GFNnu6Ym/fx8gitahM4uzqc8g7TlDd4DbkQSqrkboGKrpo8E/AX+visRSDEoVREaqsuhH0yhUDvRlU38mNtot0mNPlWLEVUUGzkkS+EomEii8wYA9csobD7jDnIXv1hms31Mzu7FqJfOr6GSL50PDk6ShHGhZ//QB6KijIy26zhH73IQJ9a6qGLFB1xdATfI2F3Z8WyLr7Uoo712t6UOsM2nvfNnDV+3ewPPFSra8ozDykGY3VCeWfR3gOWBxZ4O4Mf8e2drRPh/RcJtaZUILkBf+KwKVcUkggWQ=
-  distributions: sdist bdist_wheel
