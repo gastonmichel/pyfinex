@@ -10,13 +10,16 @@ Usage
 ======
 Include the pyfinex module and use it as a toolbox. For trading, a key and a secret key must be provided.
 
-	import pyfinex
 
-    API_KEY = 'insert key'
-    API_SECRET = 'insert secret'
+```python
+import pyfinex
 
-	resp = pyfinex.v1.positions.active(key=API_KEY, secret_key=API_SECRET)
-    resp = pyfinex.v1.public.ticker(symbol='btcusd')
+API_KEY = 'insert key'
+API_SECRET = 'insert secret'
+
+resp = pyfinex.v1.positions.active(key=API_KEY, secret_key=API_SECRET)
+resp = pyfinex.v1.public.ticker(symbol='btcusd')
+```
 
 Function names are organized for better coding
 
@@ -30,13 +33,21 @@ All documented API calls are implemented!
 Examples
 ======
 ### Get the latest BTCUSD price
-    resp = pyfinex.v1.public.ticker(symbol='btcusd')
+```python
+resp = pyfinex.v1.public.ticker(symbol='btcusd')
+```
 ### View your active orders
-    resp = pyfinex.v1.positions.active(API_KEY,API_SECRET)
+```python
+resp = pyfinex.v1.positions.active(API_KEY,API_SECRET)
+```
 ### Get the BTCUSD order book
-    resp = pyfinex.v1.public.order_book(symbol='btcusd')
+```python
+resp = pyfinex.v1.public.order_book(symbol='btcusd')
+```
 ### Get the last BTCUSD 1m candle 
-    resp = pyfinex.v2.public.candles(Symbol='tBTCUSD', TimeFrame='1m', Section='last')
+```python
+resp = pyfinex.v2.public.candles(Symbol='tBTCUSD', TimeFrame='1m', Section='last')
+```
 
 Note: in v2 the parameters are capital case.
 ### Submit a new order
@@ -45,23 +56,26 @@ For example, if you'd like to buy 0.001 BTC as 0.01 BTC/USD, you need to specify
 	resp = pyfinex.v1.orders.new(symbol="BTCUSD", amount=0.001, price=0.01, side='buy', type='market')
 
 ### In case there is a new call you can do it yourself!:
-    pyfinex.api.request(authenticate=True, 
-        key=API_KEY, 
-        secret_key=API_SECRET, 
-        version=1, 
-        endpoint='new/api/call/here', 
-        method='POST', 
-        body_params={}, 
-        query_params={})
+```python
+pyfinex.api.request(authenticate=True, 
+    key=API_KEY, 
+    secret_key=API_SECRET, 
+    version=1, 
+    endpoint='new/api/call/here', 
+    method='POST', 
+    body_params={}, 
+    query_params={})
+```
 
 Test
 ======
 1. Replace your keys in .env.example file, and rename it to .env
-1. Include your unit tests as functions in a test_vX_ file:
-    
+1. Include your unit tests as functions in a test_vX_*.py file
+    ```python
     def test_ticker():
-       resp = pyfinex.v1.public.ticker(symbol='btcusd')
-
+        resp = pyfinex.v1.public.ticker(symbol='btcusd')
+        resp['mid']
+    ```
 1. Run the tests using pytest
 
 Known Issues
