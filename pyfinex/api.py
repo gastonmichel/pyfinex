@@ -42,12 +42,14 @@ def request(key=None, secret_key=None, version=1, endpoint=None, authenticate=Fa
         header = {}
 
     response = requests.request(method, API_URL + api_path, headers=header, data=json.dumps(body_params), params=query_params, verify=True)
-    content = response.json()
 
-    if response.status_code >= 400:
-        raise BitfinexBadRequest(response.status_code, content)
+    if response.ok:
+        raise BitfinexBadRequest(response.status_code, response.text)
     else:
-        return content
+        if response.text == '':
+            raise BitfinexEmptyResponse(response.status_code)
+        else:
+            return response.json()
 
 def _nonce():
     """Return a nonce.
@@ -147,3 +149,18 @@ class BitfinexBadRequest(Exception):
         self.status_code = status_code
         self.message = message
         super().__init__(f'BITFINEX API returned {status_code} Bad Request: {message}')
+
+class BitfinexEmptyResponse(Exception):
+    """ Catches bitfinex empty response
+
+    Atributes:
+        status_code {} -- status code of the request
+    """
+    def __init__(self, status_code, message):
+        """Initialice an instance of BitfinexEmptyResponse
+        
+        Arguments:
+            status_code {} -- status code of the request
+        """
+        self.status_code = status_code
+        super().__init__(f'BITFINEX API returned an empty response. Status code: {status_code}')
