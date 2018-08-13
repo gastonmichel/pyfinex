@@ -8,5 +8,6 @@
         "tests"
     ],
     "python.unitTest.promptToConfigure": true,
-    "python.unitTest.autoTestDiscoverOnSaveEnabled": true
+    "python.unitTest.autoTestDiscoverOnSaveEnabled": true,
+    "python.jediEnabled": false
 }
