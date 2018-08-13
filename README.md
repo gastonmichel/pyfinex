@@ -1,13 +1,10 @@
-pyfinex
-======
+# pyfinex
 Python wrapper for Bitfinex API.
 
-Dependencies
-======
+# Dependencies
 Requests library is required.
 
-Usage
-======
+# Usage
 Include the pyfinex module and use it as a toolbox. For trading, a key and a secret key must be provided.
 
 
@@ -30,8 +27,11 @@ Function names are organized for better coding
 
 All documented API calls are implemented!
 
-Examples
-======
+## Exceptions
+- BitfinexBadRequest: if status_code > 400
+- BitfinexEmptyResponse: if status_code < 400 and respose is empty
+
+# Examples
 ### Get the latest BTCUSD price
 ```python
 resp = pyfinex.v1.public.ticker(symbol='btcusd')
@@ -67,8 +67,7 @@ pyfinex.api.request(authenticate=True,
     query_params={})
 ```
 
-Test
-======
+# Test
 1. Replace your keys in .env.example file, and rename it to .env
 1. Include your unit tests as functions in a test_vX_*.py file
     ```python
@@ -78,33 +77,28 @@ Test
     ```
 1. Run the tests using pytest
 
-Known Issues
-======
+# Known Issues
 - No
 
-TODO
-=====
+# TODO
 - Test every endpoint
 
 
-Contributing
-======
+# Contributing
 1. Create an issue and discuss.
 1. Create a feature branch containing only your fix or feature.
 1. Add tests, please!!
 1. Create a pull request.
 1. Thanks!
 
-References
-======
+# References
 - [https://github.com/scottjbarr/bitfinex](https://github.com/scottjbarr/bitfinex)
 - [https://github.com/jimako1989/bitfinexpy](https://github.com/jimako1989/bitfinexpy)
 - [Bitfinex official API wrapper for Ruby](https://github.com/bitfinexcom/bitfinex-api-rb)
 - [Bitfinex v1 API doc](https://bitfinex.readme.io/v1/docs)
 - [Bitfinex v2 API doc](https://bitfinex.readme.io/v2/docs)
 
-Licence
-======
+# Licence
 The MIT License (MIT)
 
 Copyright (c) 2018 faberquisque
