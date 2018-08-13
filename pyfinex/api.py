@@ -44,12 +44,13 @@ def request(key=None, secret_key=None, version=1, endpoint=None, authenticate=Fa
     response = requests.request(method, API_URL + api_path, headers=header, data=json.dumps(body_params), params=query_params, verify=True)
 
     if response.ok:
-        raise BitfinexBadRequest(response.status_code, response.text)
-    else:
         if response.text == '':
             raise BitfinexEmptyResponse(response.status_code)
         else:
             return response.json()
+    else:
+        raise BitfinexBadRequest(response.status_code, response.text)
+        
 
 def _nonce():
     """Return a nonce.
