@@ -1,4 +1,4 @@
-from ..api import request
+from pyfinex.api import request
 
 def platform_status(**params):
     """ Get the current status of the platform. 

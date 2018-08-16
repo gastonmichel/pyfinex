@@ -1,4 +1,4 @@
-from ..api import request
+from pyfinex.api import request
 
 
 def offers_active(key, secret_key, Symbol='fUSD', **params):

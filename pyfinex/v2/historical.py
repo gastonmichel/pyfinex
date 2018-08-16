@@ -1,4 +1,4 @@
-from ..api import request
+from pyfinex.api import request
 
 def deposit_withdrawal_movements(key, secret_key, Currency='BTC', **params):
     """ View your past deposits/withdrawals.

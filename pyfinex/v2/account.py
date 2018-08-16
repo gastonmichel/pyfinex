@@ -1,4 +1,4 @@
-from ..api import request
+from pyfinex.api import request
 
 def wallets(key, secret_key, **params):
     """ Get account wallets

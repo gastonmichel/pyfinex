@@ -1,4 +1,4 @@
-from ..api import request
+from pyfinex.api import request
 
 def ticker(symbol='BTCUSD', **params):
     """ Gives innermost bid and asks and information on the most recent trade, as well as high, low and volume of the last 24 hours.

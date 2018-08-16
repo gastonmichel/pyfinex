@@ -1,4 +1,4 @@
-from ..api import request
+from pyfinex.api import request
 
 def active(key, secret_key, **params):
     """ View your active positions.

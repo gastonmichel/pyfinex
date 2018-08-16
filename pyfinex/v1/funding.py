@@ -1,4 +1,4 @@
-from ..api import request
+from pyfinex.api import request
 
 def offer_new(key, secret_key, **params):
     """ Submit a new offer.

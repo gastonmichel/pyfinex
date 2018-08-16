@@ -1,4 +1,4 @@
-from ..api import request
+from pyfinex.api import request
 
 def balance(key, secret_key, **params):
     """ View all of your balance ledger entries.

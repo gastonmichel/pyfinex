@@ -1,4 +1,4 @@
-from ..api import request
+from pyfinex.api import request
 
 def orders(key, secret_key, **params):
     """ Get active orders

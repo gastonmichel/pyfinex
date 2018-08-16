@@ -1,4 +1,4 @@
-from ..api import request
+from pyfinex.api import request
 
 def info(key, secret_key, **params):
     """ Check the balance.

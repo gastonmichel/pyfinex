@@ -1,4 +1,4 @@
-from ..api import request
+from pyfinex.api import request
 
 def read(key, secret_key, **params):
     """ Read user settings

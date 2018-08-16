@@ -1,4 +1,4 @@
-from ..api import request
+from pyfinex.api import request
 
 def alert_list(key, secret_key, Type='price', **params):
     """ Get list of alerts
