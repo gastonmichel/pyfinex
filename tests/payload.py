@@ -30,10 +30,9 @@ class Order:
         self.is_hidden = is_hidden
         self.is_postonly = is_postonly
         
-    def to_dict():
 
 o = Order()
 
 class OCO_order(Order):
- 
+    pass
     

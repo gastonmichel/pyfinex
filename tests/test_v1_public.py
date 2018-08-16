@@ -18,4 +18,3 @@ def test_lendbook():
 def test_orderbook():
     resp = pyfinex.v1.public.order_book(symbol='btcusd')
     resp['bids'][0]['price']
-    

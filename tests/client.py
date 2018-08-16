@@ -18,5 +18,3 @@ class Public(object):
         return 'book'
 c = Client(123,123)
 c.v1.public.book()
-
-c.v1.
